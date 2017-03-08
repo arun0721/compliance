@@ -1,0 +1,42 @@
+
+
+@model SSCompliance.Models.SSComplianceLogin
+@{ 
+    ViewBag.Title = "Index";
+}
+<script language="Javascript">
+    function display()
+    {
+        if($("#txtUserName").attr("value") == "")
+        {
+            alert("Please enter your user name");
+            return false;
+        }
+        if ($("#txtPassword").attr("value") == "") {
+            alert("Please enter your user password");
+            return false;
+        }
+
+        //alert("Login Successful");
+        return true;
+
+    }
+</script>
+
+<h3 class="form-signin-heading">SS Compliance Login, Please login</h3>
+
+        @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @class = "form-signin" }))
+        {
+
+
+
+            <div class="alert alert-warning">@ViewBag.Status</div>
+
+            <label for="txtUserName" class="sr-only">User Name:</label>
+            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @id = "txtUserName", @placeholder= "User Name"})
+            <label for="txtPassword" class="sr-only">User Password:</label>
+            @Html.PasswordFor(m => m.UserPassword, new { @class = "form-control", @id = "txtPassword", @placeholder = "User Password" })
+            <button class="btn btn-lg btn-primary btn-block" type="submit" title="login" onclick="display();">Login</button>
+
+
+            }
