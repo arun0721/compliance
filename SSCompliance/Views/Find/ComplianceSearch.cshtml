@@ -1,0 +1,396 @@
+
+<script type="text/javascript">
+
+    function Find() {
+        var qstring = $("#formSearch").serialize();
+                
+        $.ajax({
+            url: "http://localhost:9810/api/compliance?api_key=VeaYLDhMLX_HwcbEbx27s5r3&" + qstring,
+            dataType: "application/json",
+            complete: function (data) {
+                $("#resultant").empty();
+                GenerateHtmlForEachResult(data);
+            }//function
+
+        }
+
+        );}
+
+    function GenerateHtmlForEachResult(data)
+    {
+        var htmlContent = "";
+
+        if (data) {//&& data.responseText.length > 0)
+            var response;
+            if (data.responseText && data.responseText.length > 0)
+                response = JSON.parse(data.responseText);
+            else
+                response = data;
+
+            if (response) {
+                var req = response.requestQuery;
+                if (req) {
+
+                    var nameSearch = req.name == null ? "&nbsp;" : req.name;
+                    var keyword = req.q == null ? "&nbsp;" : req.q;
+                    var fuzzyname = req.fuzzy_name == null ? "&nbsp;" : req.fuzzy_name;
+                    var type = req.type == null ? "&nbsp;" : req.type;
+
+                    htmlContent += "<hr class='hrred'/>";
+                    htmlContent += "<div class='row'>";
+                    htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Name:</div>"
+                    htmlContent += "<div class='col-xs-3'>" + nameSearch + "</div>";
+                    htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Keyword:</div>";
+                    htmlContent += "<div class='col-xs-3'>" + keyword + "</div>";
+                    htmlContent += "</div>";
+                    htmlContent += "<div class='row'>";
+                    htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Fuzzy Name:</div>"
+                    htmlContent += "<div class='col-xs-3'>" + fuzzyname + "</div>";
+                    htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Type:</div>";
+                    htmlContent += "<div class='col-xs-3'>" + type + "</div>";
+                    htmlContent += "</div>";
+                }
+                htmlContent += "<hr class='hrred'/>";
+                htmlContent += "<div class='row'>";
+                htmlContent += "<div class='col-xs-12' style='font-weight: bold;'>Screen Results</div>"
+                htmlContent += "</div>";
+
+
+                var len = response.results.length;
+                //htmlContent = "";
+                if (len > 0) {
+                    for (var i = 0; i < len; i++) {
+                        var address = "&nbsp";
+                        var city = "&nbsp;"
+                        var postalcode = "&nbsp;"
+                        var country = "&nbsp;"
+                        var state = "&nbsp";
+                        var nameMatch = response.results[i].name == null ? "&nbsp;" : response.results[i].name;
+                        var regNane = (response.results[i].federal_register_notice == null) ? "&nbsp;" : response.results[i].federal_register_notice;
+                        var startDate = (response.results[i].start_date == null) ? "&nbsp;" : (new Date(response.results[i].start_date)).toLocaleDateString();
+                        var endDate = (response.results[i].end_date == null) ? "&nbsp;" : (new Date(response.results[i].end_date)).toLocaleDateString;
+                        var rplInfo = (response.results[i].source == null) ? "&nbsp;" : response.results[i].source;
+                        var remarks = (response.results[i].remarks == null) ? "&nbsp;" : response.results[i].remarks;
+
+                        htmlContent += "<hr class='hrblue'/>";
+                        htmlContent += "<div class='row'>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Name Match :</div>"
+                        htmlContent += "<div class='col-xs-3'>" + nameMatch + "</div>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Match Score:</div>";
+                        htmlContent += "<div class='col-xs-3'>" + response.results[i].score.toString() + "&#37;" + "</div>";
+                        htmlContent += "</div>";
+                        //Address
+                        if (response.results[i].addresses.length > 0) {
+                            address = (response.results[i].addresses[0].address == null) ? "&nbsp;" : response.results[i].addresses[0].address;
+                            city = (response.results[i].addresses[0].city == null) ? "&nbsp;" : response.results[i].addresses[0].city;
+                            state = (response.results[i].addresses[0].state == null) ? "&nbsp;" : response.results[i].addresses[0].state;
+                            country = (response.results[i].addresses[0].country == null) ? "&nbsp;" : response.results[i].addresses[0].country;
+                            postalcode = (response.results[i].addresses[0].postal_code == null) ? "&nbsp;" : response.results[i].addresses[0].postal_code;
+                        }
+                        htmlContent += "<div class='row'>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Address :</div>"
+                        htmlContent += "<div class='col-xs-3'>" + address + "</div>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Reg Name</div>";
+                        htmlContent += "<div class='col-xs-3'>" + regNane + "</div>";
+                        htmlContent += "</div>";
+                        //AKA
+                        htmlContent += "<div class='row'>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>City :</div>"
+                        htmlContent += "<div class='col-xs-3'>" + city + "</div>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Reg Date</div>";
+                        htmlContent += "<div class='col-xs-3'>" + startDate + "</div>";
+                        htmlContent += "</div>";
+                        //ROW
+                        htmlContent += "<div class='row'>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>State :</div>"
+                        htmlContent += "<div class='col-xs-3'>" + state + "</div>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Creation Date</div>";
+                        htmlContent += "<div class='col-xs-3'>" + startDate + "</div>";
+                        htmlContent += "</div>";
+                        //ROW
+                        htmlContent += "<div class='row'>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Country :</div>"
+                        htmlContent += "<div class='col-xs-3'>" + country + "</div>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Expiration Date</div>";
+                        htmlContent += "<div class='col-xs-3'>" + endDate + "</div>";
+                        htmlContent += "</div>";
+                        //ROW
+                        htmlContent += "<div class='row'>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Postal Code :</div>"
+                        htmlContent += "<div class='col-xs-3'>" + postalcode + "</div>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>RPL Info</div>";
+                        htmlContent += "<div class='col-xs-3'>" + rplInfo + "</div>";
+                        htmlContent += "</div>";
+                        //ROW
+                        htmlContent += "<div class='row'>";
+                        htmlContent += "<div class='col-xs-3'>&nbsp;</div>"
+                        htmlContent += "<div class='col-xs-3'>&nbsp;</div>";
+                        htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>Remarks</div>";
+                        htmlContent += "<div class='col-xs-3'>" + remarks + "</div>";
+                        htmlContent += "</div>";
+                    }
+
+                }
+                else {
+                    htmlContent += "<hr class='hrred'/>";
+                    htmlContent += "<div class='row'>";
+                    htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>No Results Returned</div>";
+                    htmlContent += "</div>";
+                }
+            }
+            else {
+                htmlContent += "<hr class='hrred'/>";
+                htmlContent += "<div class='row'>";
+                htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>No Results Returned</div>";
+                htmlContent += "</div>";
+            }
+            $("#resultant").append(htmlContent);
+
+        }
+        else {
+            htmlContent += "<hr class='hrred'/>";
+            htmlContent += "<div class='row'>";
+            htmlContent += "<div class='col-xs-3' style='font-weight: bold;'>No Results Returned</div>";
+            htmlContent += "</div>";
+            htmlContent += "<hr class='hrred'/>";
+            $("#resultant").append(htmlContent);
+        }
+
+    }
+
+    function DisplayResults(data) {
+        $("#resultant").empty();
+
+        if (data) {
+            $.each(data, function (index, element) {
+                GenerateHtmlForEachResult(element);
+            });
+        }
+        //$("#fileDisplayArea").text("");
+        //$("#fileDisplayArea").text(JSON.stringify(data));
+    }
+
+    function MultiSearch() {
+        var contents = $("#fileDisplayArea").text();
+        if (contents) {
+
+            $.ajax({
+                url: 'http://localhost:9810/api/compliance/FindAll',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: contents,
+                async: true,
+                crossDomain: false,
+                success: function (result) {
+                    DisplayResults(result);
+                },
+                complete: function (result) {
+                    //alert("Compelted");
+                },
+                error: function (xhr, status, err) {
+                    alert(status + ":" + err);
+                }
+            }
+            );
+        }
+
+    }
+
+</script>
+<style>
+    .hrblack {
+        display: block;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: auto;
+        margin-right: auto;
+        border-style: inset;
+        border-width: 1px;
+    }
+
+    .hrred {
+        display: block;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: auto;
+        margin-right: auto;
+        border-width: 1px;
+        border-color: crimson;
+        border-style: dotted;
+    }
+
+    .hrblue {
+        display: block;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        margin-left: auto;
+        margin-right: auto;
+        border-width: 1px;
+        border-color: blue;
+        border-style: dotted;
+    }
+    .btn-file 
+    {
+    position: relative;
+    overflow: hidden;
+    }
+    .btn-file input[type=file] 
+    {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+    }
+.file {
+  visibility: hidden;
+  position: absolute;
+}
+</style> 
+
+<script>
+    $(document).on('click', '.browse', function () {
+        var file = $(this).parent().parent().parent().find('.file');
+        file.trigger('click');
+    });
+    $(document).on('change', '.file', function () {
+        var reader = new FileReader();
+
+        var file = event.target.files[0];
+
+        reader.onload = (function (reader) {
+            return function () {
+                var contents = reader.result;
+
+                $("#fileDisplayArea").text(contents);
+            }
+        })(reader);
+        reader.readAsText(file);
+
+        $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
+    });
+
+
+
+</script> 
+<form id="formSearch">
+<div class="form-group has-success">
+
+    <div class="col-xs-10 col-lg-12">
+        <span class="help-block">Keyword</span>
+        <input type="text" name="q" id="inputKeyword" class="form-control" placeholder="Input Keyword for search">
+
+    </div>
+
+</div>
+
+<div class="form-group has-success">
+
+    <div class="col-xs-5 col-lg-6">
+        <span class="help-block">Name</span>
+        <input type="text" name="name" id="inputName" class="form-control" placeholder="Input with Name">
+    </div>
+    <div class="col-xs-5 col-lg-6">
+        <span class="help-block">&nbsp;</span>
+        <label class="form-check-label" style="font-size:1.5em">
+            Fuzzy Name
+            <input name="fuzzy_name" type="checkbox" id="fuzzyname" class="form-check-input" placeholder="Input with Name">
+        </label>
+    </div>
+
+</div>
+
+<div class="form-group has-success">
+
+    <div class="col-xs-6 col-lg-6">
+        <span class="help-block">Address</span>
+        <input name="address" type="text" id="inputAddress" class="form-control" placeholder="Input address">
+
+    </div>
+
+    <div class="col-xs-6 col-lg-6">
+        <span class="help-block">Sources</span>
+
+        <select name="sources" id="id_sources" class="js-example-basic-multiple js-states form-control">
+            <option value=""></option>
+            <option value="DPL">Denied Persons List(DPL) - Bureau of Industry and Security</option>
+            <option value="EL">Entity List (EL) - Bureau of Industry and Security</option>
+            <option value="FSE">Foreign Sanctions Evaders (FSE) - Treasury Department</option>
+            <option value="DTC">ITAR Debarred (DTC) - State Department</option>
+            <option value="ISN">Nonproliferation Sanctions (ISN) - State Department</option>
+            <option value="ISA">Non-SDN Iranian Sanctions Act List (ISA) - Treasury Department</option>
+            <option value="PLC">Palestinian Legislative Council List (PLC) - Treasury Department</option>
+            <option value="561">Part 561 List (561) - Treasury Department</option>
+            <option value="SSI">Sectoral Sanctions Identifications List (SSI) - Treasury Department</option>
+            <option value="SDN">Specially Designated Nationals (SDN) - Treasury Department</option>
+            <option value="UVL">Unverified List (UVL) - Bureau of Industry and Security</option>
+            <option value="FSE">Foreign Sanctions Evaders (FSE) - Treasury Department</option>
+            <option value="FSE">Foreign Sanctions Evaders (FSE) - Treasury Department</option>
+        </select>
+
+
+
+
+    </div>
+</div>
+<div class="form-group has-success">
+
+    <div class="col-xs-6 col-lg-6">
+        <span class="help-block">Type</span>
+        <select name="type" id="id_type" class="js-example-basic-multiple js-states form-control">
+            <option value="Off">Off</option>
+            <option value="Individual">Individual</option>
+            <option value="Entity">Entity</option>
+            <option value="Vessel">Vessel</option>
+        </select>
+    </div>
+
+
+</div>
+<br />
+<br />
+
+<div class="row form-row">
+    <span>
+     </span>
+</div>
+<div  class="form-group has-success">
+    <div class="col-xs-12">
+        <button id="ember1104" class="btn btn-primary btn-lg btn-block" value="Search" type="button" onclick="Find();">Search</button>
+    </div>
+ </div>
+    <div class="form-group has-success">
+        <div class="col-xs-12">
+            <label class="control-label">Select File For Multiple Search</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="file" name="img[]" class="file">
+            <div class="input-group col-xs-12">
+                <input type="text" id="queryFile" class="form-control input-lg" disabled placeholder="Upload Search File">
+                <div class="input-group-btn">
+                    <button class="browse btn btn-primary input-lg" type="button"><i class="glyphicon glyphicon-search"></i> Browse</button>
+                </div>
+            </div>
+            <pre id="fileDisplayArea" hidden></pre>
+     </div>
+    <div class="form-group">
+        <div  class="col-xs-12">
+            <button id="btnMultiSearch" class="btn btn-primary btn-lg btn-block" value="Multiple Search" type="button" onclick="MultiSearch();">Multi search</button>
+        </div>
+     </div>
+        <div id="resultant">
+        </div>
+
+</form>
+
+
